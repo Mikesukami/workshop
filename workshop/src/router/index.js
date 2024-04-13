@@ -7,6 +7,11 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
+    name: 'login',
+    component: () => import('../views/Login.vue')
+  },
+  {
+    path: '/home',
     name: 'home',
     component: HomeView
   },
@@ -19,6 +24,21 @@ const routes = [
         path: '/me',
         name: 'me',
         component: () => import('../views/Me.vue')
+      },
+      {
+        path: '/apicon',
+        name: 'apicon',
+        component: () => import('../views/Apicon.vue')
+      },
+      {
+        path: '/simple',
+        name: 'simple',
+        component: () => import('../views/Simple.vue')
+      },
+      {
+        path: '/grade',
+        name: 'grade',
+        component: () => import('../views/Grade.vue')
       },
       {
         path: '/about',

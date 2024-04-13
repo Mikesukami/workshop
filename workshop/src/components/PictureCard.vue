@@ -2,26 +2,33 @@
     <div>
         <v-container>
             <v-row>
-                <v-col cols="12" md="12">
+                <v-col cols="12">
                     <v-card>
-                        <v-img src="../assets/profile.jpeg" aspect-ratio="1" max-height="500"></v-img>
-                        <v-card-title class="headline"><b>{{ profile.name }}</b></v-card-title>
-                        <v-card-subtitle>{{ profile.nickname }}</v-card-subtitle>
-                        <v-card-text>
-                            <p><b>Graduation:</b> {{ profile.graduation }}</p>
-                            <p><b>Education:</b> {{ profile.education }}</p>
-                            <p><b>Hobby:</b> {{ profile.hobby }}</p>
-                            <p><b>Strange:</b> {{ profile.strange }}</p>
-                            <p><b>Weakness:</b> {{ profile.weakness }}</p>
-                            <p v-show="showLikes">
-                                <b>Likes:</b>
-                            <ul>
-                                <li v-for="like in profile.likes" :key="like">{{ like }}</li>
-                            </ul>
-                            </p>
-                            <v-btn color="primary" elevation="3" small @click="toggleLikesVisibility">Click for {{ showLikes ?
-                                'Hide' : 'Show' }} Likes</v-btn>
-                        </v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-img src="../assets/profile.jpeg" aspect-ratio="1" max-height="600"  rounded></v-img>
+                            </v-col>
+
+                            <v-col cols="12" md="6">
+                                <v-card-title class="headline"><b>{{ profile.name }}</b></v-card-title>
+                                <v-card-subtitle>{{ profile.nickname }}</v-card-subtitle>
+                                <v-card-text>
+                                    <p><b>Graduation:</b> {{ profile.graduation }}</p>
+                                    <p><b>Education:</b> {{ profile.education }}</p>
+                                    <p><b>Hobby:</b> {{ profile.hobby }}</p>
+                                    <p><b>Strange:</b> {{ profile.strange }}</p>
+                                    <p><b>Weakness:</b> {{ profile.weakness }}</p>
+                                    <p v-show="showLikes">
+                                        <b>Likes:</b>
+                                    <ul>
+                                        <li v-for="like in profile.likes" :key="like">{{ like }}</li>
+                                    </ul>
+                                    </p>
+                                    <v-btn color="primary" elevation="3" small @click="toggleLikesVisibility">Click for
+                                        {{ showLikes ? 'Hide' : 'Show' }} Likes</v-btn>
+                                </v-card-text>
+                            </v-col>
+                        </v-row>
                     </v-card>
                 </v-col>
             </v-row>
