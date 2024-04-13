@@ -7,12 +7,12 @@
         </v-app-bar>
         <div class="login-background">
             <v-main>
-                <v-container class="login-form">
-                    <v-row>
+                <v-container>
+                    <v-row >
                         <v-col cols="6" sm="6" >
-                            <v-img src="https://mpics-cdn.mgronline.com/pics/Images/566000007055101.JPEG"></v-img>
+                            <v-img  src="https://mpics-cdn.mgronline.com/pics/Images/566000007055101.JPEG" ></v-img>
                         </v-col>
-                        <v-col cols="12" sm="6" xs="3">
+                        <v-col cols="12" sm="6" >
                             <v-card>
                                 <v-card-title>
                                     <span class="headline">เข้าสู่ระบบ</span>
@@ -44,9 +44,13 @@
                                         </v-col>
                                     </v-row>
                                 </v-container>
-
                             </v-card>
                         </v-col>
+                    </v-row>
+                </v-container>
+                <v-container>
+                    <v-row>
+
                     </v-row>
                 </v-container>
             </v-main>
@@ -84,9 +88,6 @@ export default {
     margin-left: 17px;
 }
 
-.login-form {
-    /* margin-left: 200px; */
-}
 
 .login-background {
     background-color: #EE4C29;
