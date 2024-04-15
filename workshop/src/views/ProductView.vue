@@ -44,8 +44,7 @@
                             </v-text-field>
                         </v-col>
                         <v-col cols="6">
-                            <v-file-input v-model="postdata.p_image" label="Product Image" @change="onFileSelected" accept="image/*">
-                            </v-file-input>
+                            <input type="file" ref="fileInput" @change="onFileSelected">
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -80,13 +79,13 @@ export default {
                 p_name: '',
                 p_price: '',
                 p_stock: '',
-                p_image: ''
+                p_image: null
             },
             postdefault: {
                 p_name: '',
                 p_price: '',
                 p_stock: '',
-                p_image: ''
+                p_image: null
             }
         }
     },
@@ -100,7 +99,14 @@ export default {
     },
     methods: {
         onFileSelected(event) {
-            this.selectedFile = event;
+            const file = event.target.files[0];
+            console.log(file);
+            if (file) {
+                this.selectedFile = event.target.files[0];
+                this.postdata.p_image = file;
+                console.log(this.postdata.p_image);
+            }
+            // this.selectedFile = event;
         },
         newItem() {
             this.id = ''
@@ -121,7 +127,7 @@ export default {
             if (this.id == '') {
                 this.savePostData(postdata)
             } else {
-                this.savePutData()
+                this.savePutData(postdata)
             }
         },
         getData() {
@@ -132,7 +138,7 @@ export default {
                         Authorization: `Bearer ${this.token}`
                     }
                 }
-        ).then((response) => {
+            ).then((response) => {
                 console.log('data from api', response.data);
                 this.apidata = response.data.data
             })
@@ -148,7 +154,8 @@ export default {
             try {
                 const { data } = await this.axios.post('http://localhost:3000/api/v1/products', this.postdata, {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${this.token}`
                     }
                 });
                 console.log(data);
@@ -160,21 +167,38 @@ export default {
                 alert('error !');
             }
         },
-        async savePutData() {
+        async savePutData(item) {
+
+            // this.postdata = { ...item };
+            this.postdata.p_name = item.p_name;
+            this.postdata.p_price = item.p_price;
+            this.postdata.p_stock = item.p_stock;
+            
+            console.log(this.postdata);
             try {
-                const { data } = await this.axios.put(`http://localhost:3000/api/v1/products/` + this.id, this.postdata)
+                const { data } = await this.axios.put(`http://localhost:3000/api/v1/products/` + this.postdata._id, this.postdata, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${this.token}`
+                    }
+                    
+                })
                 console.log(data);
                 alert('Update complete')
                 this.getData()
                 this.closeItem()
             } catch (error) {
-                console.log(error);
+                console.log("error is :" + error);
                 alert('error !')
             }
         },
         async saveDeldata(item) {
             try {
-                const { data } = await this.axios.delete(`http://localhost:3000/api/v1/products/` + item._id)
+                const { data } = await this.axios.delete(`http://localhost:3000/api/v1/products/` + item._id, {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
+                })
                 console.log(data);
                 alert('Delete complete')
                 this.getData()

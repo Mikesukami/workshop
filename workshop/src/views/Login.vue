@@ -8,11 +8,11 @@
         <div class="login-background">
             <v-main>
                 <v-container>
-                    <v-row >
-                        <v-col cols="6" sm="6" >
-                            <v-img  src="https://mpics-cdn.mgronline.com/pics/Images/566000007055101.JPEG" ></v-img>
+                    <v-row>
+                        <v-col cols="6" sm="6">
+                            <v-img src="https://mpics-cdn.mgronline.com/pics/Images/566000007055101.JPEG"></v-img>
                         </v-col>
-                        <v-col cols="12" sm="6" >
+                        <v-col cols="12" sm="6">
                             <v-card>
                                 <v-card-title>
                                     <span class="headline">เข้าสู่ระบบ</span>
@@ -27,8 +27,7 @@
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn style="color: aliceblue;"  color=#EE4C29 size="large" @click="login()"
-                                         block>
+                                    <v-btn style="color: aliceblue;" color=#EE4C29 size="large" @click="login()" block>
                                         เข้าสู่ระบบ
                                     </v-btn>
 
@@ -48,20 +47,45 @@
                         </v-col>
                     </v-row>
                 </v-container>
-                <v-container>
-                    <v-row>
-
-                    </v-row>
-                </v-container>
             </v-main>
         </div>
+        <!-- <v-dialog v-model="dialog" persistent width="300">
+            <v-card>
+                <v-card-title class="headline">Logging in...</v-card-title>
+                <v-card-text class="text-center">
+                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                </v-card-text>
+            </v-card>
+        </v-dialog> -->
+
+        <v-dialog v-model="dialog" persistent width="300">
+            <v-card>
+                <v-card-title class="text-center">{{ loginMessage }}</v-card-title>
+                <v-card-text class="text-center">
+                    <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
+                    <v-icon v-else color="green">mdi-check-circle</v-icon>
+                </v-card-text>
+                <v-card-text class="text-center">
+                    redirecting...
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
+        <v-snackbar
+            v-model="snackbar.show"
+            :color="snackbar.color"
+            :timeout="snackbar.timeout"
+            top
+            right>
+            {{ snackbar.text }}
+        </v-snackbar>
     </div>
 </template>
 
 <script>
 import Cookies from 'js-cookie';
 export default {
-    
+
     data: () => ({
         valid: false,
         username: '',
@@ -72,28 +96,66 @@ export default {
         password: '',
         passwordRules: [
             v => !!v || 'Password is required',
-        ]
+        ],
+        snackbar: {
+            show: false,
+            text: '',
+            color: '',
+            timeout: 2000
+        },
+        dialog: false,
+        loading: true,
+        loginMessage: 'Logging in...'
     }),
     methods: {
-        async login(){
-            if(this.valid){
-                console.log(this.username, this.password)
-                let res = await this.axios.post('http://localhost:3000/api/v1/login', {
-                    username: this.username,
-                    password: this.password
-                });
-                
-                if(res.data.status == 200){
-                    console.log(res.data);
-                    this.$router.push('/product-view');
-                    const token = res.data.token;
-                    console.log(token);
-                    // localStorage.setItem('token', token);
-                    Cookies.set('token', token);
+        async login() {
+            if (this.valid) {
+                this.dialog = true;
+                this.loading = true;
+                this.loginMessage = 'Logging in...';
 
-                }else{
-                    alert('Username or Password is incorrect');
+                try {
+                    console.log(this.username, this.password)
+                    const res = await this.axios.post('http://localhost:3000/api/v1/login', {
+                        username: this.username,
+                        password: this.password
+                    });
+
+                    if (res.data.status == 200) {
+                        // this.snackbar.show = true;
+                        // this.snackbar.text = 'Login successful!';
+                        // this.snackbar.color = 'success';
+
+                        Cookies.set('token', res.data.token, { expires: 1 });
+
+                        this.loginMessage = 'Login successful!';
+                        this.loading = false;
+
+                        setTimeout(() => {
+                            this.dialog = false; // Hide the dialog
+                            this.$router.push('/product-view');
+                        }, 1000);
+
+                        // console.log(res.data);
+                        // this.$router.push('/product-view');
+                        // const token = res.data.token;
+                        // console.log(token);
+                        // // localStorage.setItem('token', token);
+                        // Cookies.set('token', token);
+
+                    } else {
+                        this.dialog = false;
+                        this.snackbar.show = true;
+                        this.snackbar.text = 'Login failed: Username or Password is incorrect';
+                        this.snackbar.color = 'error';
+                    }
+                } catch (error) { 
+                    this.dialog = false;
+                    this.snackbar.show = true;
+                    this.snackbar.text = 'Login failed: Username or Password is incorrect';
+                    this.snackbar.color = 'error';
                 }
+
             }
         }
     }
