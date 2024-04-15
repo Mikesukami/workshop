@@ -8,6 +8,11 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)
 
+Vue.filter('formatPrice', function(value) {
+  if (!value) return ''
+  return parseFloat(value).toLocaleString();
+});
+
 Vue.config.productionTip = false
 
 new Vue({

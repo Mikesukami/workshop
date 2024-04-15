@@ -19,7 +19,7 @@
                                 </v-card-title>
                                 <v-card-text>
                                     <v-form v-model="valid">
-                                        <v-text-field v-model="Username" label="Username" prepend-icon="mdi-email"
+                                        <v-text-field v-model="username" label="Username" prepend-icon="mdi-email"
                                             outlined type="username" :rules="usernameRules" required></v-text-field>
                                         <v-text-field v-model="password" label="Password" prepend-icon="mdi-lock"
                                             outlined :rules="passwordRules" type="password" required></v-text-field>
@@ -27,7 +27,7 @@
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn style="color: aliceblue;"  color=#EE4C29 size="large"
+                                    <v-btn style="color: aliceblue;"  color=#EE4C29 size="large" @click="login()"
                                          block>
                                         เข้าสู่ระบบ
                                     </v-btn>
@@ -59,9 +59,9 @@
 </template>
 
 <script>
-
-
+import Cookies from 'js-cookie';
 export default {
+    
     data: () => ({
         valid: false,
         username: '',
@@ -74,6 +74,29 @@ export default {
             v => !!v || 'Password is required',
         ]
     }),
+    methods: {
+        async login(){
+            if(this.valid){
+                console.log(this.username, this.password)
+                let res = await this.axios.post('http://localhost:3000/api/v1/login', {
+                    username: this.username,
+                    password: this.password
+                });
+                
+                if(res.data.status == 200){
+                    console.log(res.data);
+                    this.$router.push('/product-view');
+                    const token = res.data.token;
+                    console.log(token);
+                    // localStorage.setItem('token', token);
+                    Cookies.set('token', token);
+
+                }else{
+                    alert('Username or Password is incorrect');
+                }
+            }
+        }
+    }
 }
 </script>
 

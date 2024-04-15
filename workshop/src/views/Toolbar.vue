@@ -19,11 +19,17 @@
       <v-text-field
         v-model="search"
         append-icon="mdi-magnify"
-        label="Search"
+        label="Search product or shop here..."
         single-line
         hide-details
-        
+        variant="solo"
       ></v-text-field>
+
+      
+
+      <v-btn text>
+        <v-icon>mdi-cart</v-icon>
+      </v-btn>
 
       <v-spacer></v-spacer>
 
@@ -32,7 +38,7 @@
         target="_blank"
         text
       >
-        <span class="mr-2">Contact us</span>
+        <span class="mr-2" @click="logout" >Logout</span>
       </v-btn>
     </v-app-bar>
 
@@ -43,8 +49,19 @@
 </template>
 
 <script>
+import Cookie from 'js-cookie';
 export default {
-
+  data() {
+    return {
+      search: '',
+    }
+  },
+  methods: {
+    logout() {
+      Cookie.remove('token')
+      this.$router.push('/')
+    }
+  }
 }
 </script>
 
