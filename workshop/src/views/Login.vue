@@ -119,7 +119,10 @@ export default {
                     const res = await this.axios.post('http://localhost:3000/api/v1/login', {
                         username: this.username,
                         password: this.password
+                        
                     });
+
+                    console.log(res.data);
 
                     if (res.data.status == 200) {
                         // this.snackbar.show = true;
@@ -130,11 +133,19 @@ export default {
 
                         this.loginMessage = 'Login successful!';
                         this.loading = false;
+                        if(res.data.role == 'admin') {
+                            setTimeout(() => {
+                                this.dialog = false; // Hide the dialog
+                                this.$router.push('/product-view');
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                this.dialog = false; // Hide the dialog
+                                this.$router.push('/product-emp');
+                            }, 1000);
+                        }
 
-                        setTimeout(() => {
-                            this.dialog = false; // Hide the dialog
-                            this.$router.push('/product-view');
-                        }, 1000);
+                
 
                         // console.log(res.data);
                         // this.$router.push('/product-view');

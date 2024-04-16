@@ -15,6 +15,9 @@
                         <v-card-text>
                             <div style="color:#EE4C29">฿{{ item.p_price | formatPrice }}</div>
                         </v-card-text>
+                        <v-card-text>
+                            <div>Stock : {{ item.p_stock }}</div>
+                        </v-card-text>
                         <v-rating v-model="rating" background-color="orange lighten-3" color="orange" small></v-rating>
                         <v-card-actions>
                             <v-btn color="primary" @click="editItem(item)">Edit</v-btn>
@@ -173,7 +176,7 @@ export default {
             this.postdata.p_name = item.p_name;
             this.postdata.p_price = item.p_price;
             this.postdata.p_stock = item.p_stock;
-            
+
             console.log(this.postdata);
             try {
                 const { data } = await this.axios.put(`http://localhost:3000/api/v1/products/` + this.postdata._id, this.postdata, {
