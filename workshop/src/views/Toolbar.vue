@@ -27,8 +27,9 @@
 
       
 
-      <v-btn text>
-        <v-icon>mdi-cart</v-icon>
+      <v-btn text @click="cart()">
+        <v-icon >mdi-cart</v-icon>
+
       </v-btn>
 
       <v-spacer></v-spacer>
@@ -38,7 +39,7 @@
         target="_blank"
         text
       >
-        <span class="mr-2" @click="logout" >Logout</span>
+        <span class="mr-2" @click="logout">Logout</span>
       </v-btn>
     </v-app-bar>
 
@@ -60,6 +61,9 @@ export default {
     logout() {
       Cookie.remove('token')
       this.$router.push('/')
+    },
+    cart() {
+      this.$router.push('/allcart')
     }
   }
 }
