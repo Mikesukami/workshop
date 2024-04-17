@@ -2,7 +2,7 @@
     <div>
         <v-row>
             <v-col cols="12">
-                <v-btn class="mt-6" color="success" @click="newItem()">New Item</v-btn>
+                <h1>Product</h1>
             </v-col>
             <v-col cols="12" md="2" sm="4" xs="2" v-for="(item, index) in apidata" :key="index">
                 <v-hover v-slot="{ hover }">
@@ -14,26 +14,40 @@
                         <v-card-text>
                             <div style="color:#EE4C29">฿{{ item.p_price | formatPrice }}</div>
                         </v-card-text>
-                        <v-card-text>
-                            <div>Stock : {{ item.p_stock }}</div>
+                        <v-card-text v-if="item.p_stock > 0">
+                            Stock : {{ item.p_stock }}
                         </v-card-text>
+                        <v-card-text v-else>
+                            <v-badge :value="item.p_stock === 0" color="red" overlap content="Out of stock" class="ml-2 "></v-badge>
+                        </v-card-text>
+
                         <v-rating v-model="rating" background-color="orange lighten-3" color="orange" small></v-rating>
                         <v-card-actions>
                             <div>
-                                <v-btn icon @click="decrementQty(index)">
+                                <v-btn icon @click="decrementQty(index)" :disabled="item.p_stock === 0">
                                     <v-icon>mdi-minus</v-icon>
                                 </v-btn>
                                 <span>{{ quantities[index] || 0 }}</span>
-                                <v-btn icon @click="incrementQty(index)">
+                                <v-btn icon @click="incrementQty(index)" :disabled="item.p_stock === 0">
                                     <v-icon>mdi-plus</v-icon>
                                 </v-btn>
                             </div>
-                            <v-btn color="success" @click="addCart(item, index)">ADD CART</v-btn>
+                            <v-btn color="success" @click="addCart(item, index)" :disabled="item.p_stock === 0">ADD
+                                CART</v-btn>
                         </v-card-actions>
                     </v-card>
+
                 </v-hover>
             </v-col>
         </v-row>
+        <v-snackbar v-model="snackbar.show" :color="snackbar.color" :right="true" :bottom="true" timeout="1500">
+            {{ snackbar.text }}
+            <template v-slot:action="{ attrs }">
+                <v-btn color="white" text v-bind="attrs" @click="snackbar.show = false">
+                    Close
+                </v-btn>
+            </template>
+        </v-snackbar>
     </div>
 </template>
 
@@ -52,7 +66,12 @@ export default {
             rating: 3.5,
             id: '',
             apidata: [],
-            quantities: []
+            quantities: [],
+            snackbar: {
+                show: false,
+                color: 'error',
+                text: ''
+            }
         }
     },
     created() {
@@ -60,10 +79,18 @@ export default {
     },
     methods: {
         incrementQty(index) {
-            this.$set(this.quantities, index, (this.quantities[index] || 0) + 1);
+            const currentQty = this.quantities[index] || 0;
+            const stockAvailable = this.apidata[index].p_stock;
+
+            if (currentQty < stockAvailable) {
+                this.$set(this.quantities, index, currentQty + 1);
+            } else {
+                this.snackbar.show = true;
+                this.snackbar.text = 'Cannot increase quantity. Stock limit reached.';
+            }
         },
         decrementQty(index) {
-            if (this.quantities[index] && this.quantities[index] > 1) {
+            if (this.quantities[index] && this.quantities[index] > 0) {
                 this.$set(this.quantities, index, this.quantities[index] - 1);
             }
         },

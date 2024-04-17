@@ -10,7 +10,7 @@
                 <v-container>
                     <v-row>
                         <v-col cols="6" sm="6">
-                            <v-img src="https://mpics-cdn.mgronline.com/pics/Images/566000007055101.JPEG"></v-img>
+                            <v-img src="https://static.vecteezy.com/system/resources/previews/011/665/859/non_2x/now-open-shop-or-new-store-red-and-orange-color-sign-on-black-background-template-design-for-opening-event-can-be-used-for-poster-flyer-banner-free-vector.jpg"></v-img>
                         </v-col>
                         <v-col cols="12" sm="6">
                             <v-card>

@@ -21,9 +21,10 @@
                         <v-rating v-model="rating" background-color="orange lighten-3" color="orange" small></v-rating>
                         <v-card-actions>
                             <v-btn color="primary" @click="editItem(item)">Edit</v-btn>
-                            <v-btn color="error" @click="saveDeldata(item)">Delete</v-btn>
+                            <v-btn color="error" @click="openDialog(item)">Delete</v-btn>
                         </v-card-actions>
                     </v-card>
+
                 </v-hover>
             </v-col>
         </v-row>
@@ -58,6 +59,18 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="dialog" persistent max-width="290">
+            <v-card>
+                <v-card-title>Confirm Deletion</v-card-title>
+                <v-card-text>Are you sure you want to delete this product?</v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="red darken-1" text @click="closeDialog">Cancel</v-btn>
+                    <v-btn color="green darken-1" text @click="confirmDelete">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -77,6 +90,7 @@ export default {
             rating: 3.5,
             id: '',
             dialogedit: false,
+            dialog: false,
             apidata: [],
             postdata: {
                 p_name: '',
@@ -184,12 +198,12 @@ export default {
                         'Content-Type': 'multipart/form-data',
                         Authorization: `Bearer ${this.token}`
                     }
-                    
+
                 })
                 console.log(data);
                 alert('Update complete')
-                this.getData()
-                this.closeItem()
+                this.getData();
+                this.closeItem();
             } catch (error) {
                 console.log("error is :" + error);
                 alert('error !')
@@ -203,12 +217,40 @@ export default {
                     }
                 })
                 console.log(data);
-                alert('Delete complete')
-                this.getData()
-                this.closeItem()
+                this.getData();
+                this.closeItem();
             } catch (error) {
                 console.log(error);
                 alert('error !')
+            }
+        },
+        getBadgeContent(item) {
+            if (item.p_stock === 0) return "Out of Stock";
+            if (item.p_stock < 5) return "Low Stock"; // Example threshold
+            if (item.isNew) return "New"; // Assuming you have an 'isNew' property
+            return ""; // No badge content for items in normal stock
+        },
+        getBadgeColor(item) {
+            if (item.p_stock === 0) return "red";
+            if (item.p_stock < 5) return "orange";
+            if (item.isNew) return "green";
+            return "grey"; // Default or no special color for normal items
+        },
+        openDialog(item) {
+            this.selectedItem = item;
+            this.dialog = true;
+        },
+
+        closeDialog() {
+            this.dialog = false;
+            this.selectedItem = null;
+        },
+
+        confirmDelete() {
+            if (this.selectedItem) {
+                this.saveDeldata(this.selectedItem);
+                this.dialog = false;
+                this.selectedItem = null;
             }
         }
     }

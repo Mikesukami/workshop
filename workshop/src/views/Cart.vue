@@ -24,7 +24,7 @@
                             <div style="color:#EE4C29">ราคารวม : {{ item.p_total | formatPrice }}</div>
                         </v-card-text>
                         <v-card-actions>
-                            <v-btn color="red" @click="delProductCart(item)">DELETE</v-btn>
+                            <v-btn color="red" @click="openDialog(item)">DELETE</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-hover>
@@ -43,6 +43,17 @@
                 </v-card>
             </v-col>
         </v-row>
+        <v-dialog v-model="dialog" persistent max-width="290">
+            <v-card>
+                <v-card-title >Confirm Deletion</v-card-title>
+                <v-card-text>Are you sure you want to delete this item from the cart?</v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="red darken-1" text @click="closeDialog">Cancel</v-btn>
+                    <v-btn color="green darken-1" text @click="confirmDelete">Confirm</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -61,7 +72,9 @@ export default {
             rating: 3.5,
             id: '',
             apidata: [],
-            quantities: []
+            quantities: [],
+            dialog: false,
+            selectedItem: null,
         }
     },
     created() {
@@ -90,7 +103,6 @@ export default {
                             Authorization: `Bearer ${this.token}`
                         }
                     })
-                alert('Delete success');
                 console.log('Delete success', res.data);
                 this.getData();
             } catch (error) {
@@ -99,11 +111,11 @@ export default {
             }
         },
         getNet() {
-        let total = 0;
-        for (const item of this.apidata) {
-            total += item.Qty * item.p_price;
-        }
-        return total;
+            let total = 0;
+            for (const item of this.apidata) {
+                total += item.Qty * item.p_price;
+            }
+            return total;
         },
         async OrderConfirm() {
             try {
@@ -120,6 +132,23 @@ export default {
             } catch (error) {
                 console.log('Order error', error.response.data.message)
                 alert('Order error');
+            }
+        },
+        openDialog(item) {
+            this.selectedItem = item;
+            this.dialog = true;
+        },
+
+        closeDialog() {
+            this.dialog = false;
+            this.selectedItem = null;
+        },
+
+        confirmDelete() {
+            if (this.selectedItem) {
+                this.delProductCart(this.selectedItem);
+                this.dialog = false;
+                this.selectedItem = null;
             }
         }
     }
