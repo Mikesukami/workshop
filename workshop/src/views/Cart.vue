@@ -1,76 +1,128 @@
 <template>
-    <div class="container">
-        <div>
-            <h1>Cart</h1>
-        </div>
-        <v-row>
-            <v-col v-for="(item, index) in apidata" :key="index" cols="12" sm="6" md="4">
-                <v-card>
-                    <v-hover>
-                        <template v-slot:default="{ hover }">
-                            <v-img v-bind:src="item.image" height="200px" contain>
-                                <v-expand-transition>
-                                    <v-overlay v-if="hover" absolute color="black">
-                                        <v-btn color="primary" fab dark small @click="addCart(item, index)">
-                                            <v-icon>mdi-cart</v-icon>
-                                        </v-btn>
-                                    </v-overlay>
-                                </v-expand-transition>
-                            </v-img>
-                        </template>
-                    </v-hover>
-                    <v-card-title>
-                        <div>
-                            <h3>{{ item.name }}</h3>
-                            <p>{{ item.description }}</p>
-                            <p>{{ item.price | formatPrice }}</p>
-                        </div>
+    <div>
+        <h1>Cart</h1>
+        <v-row v-if="apidata.length === 0">
+            <v-col cols="12" md="2" sm="4" xs="2">
+                <v-card class="mx-auto" width="200">
+                    <v-card-title primary-title>
+                        <div>ไม่มีสินค้าในตะกร้า</div>
                     </v-card-title>
-                    <v-card-actions>
-                        <v-btn fab small color="primary" @click="decrementQty(index)">
-                            <v-icon>mdi-minus</v-icon>
-                        </v-btn>
-                        <v-btn fab small color="primary" @click="incrementQty(index)">
-                            <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                        <span>{{ quantities[index] || 0 }}</span>
-                    </v-card-actions>
+                </v-card>
+            </v-col>
+        </v-row>
+        <v-row v-if="apidata.length > 0">
+            <v-col cols="12" md="2" sm="4" xs="2" v-for="(item, index) in apidata" :key="index">
+                <v-hover v-slot="{ hover }">
+                    <v-card :elevation="hover ? 16 : 2" :class="{ 'on-hover': hover }" class="mx-auto" width="200">
+                        <v-img :src="`http://localhost:3000/images/${item.p_image}`" height="300" />
+                        <v-card-title primary-title>
+                            <div>{{ item.p_name }}</div>
+                        </v-card-title>
+                        <v-card-text>
+                            <div>จำนวน : {{ item.Qty }} ชิ้น</div>
+                            <div style="color:green">ราคาต่อชิ้น ฿ {{ item.p_price | formatPrice }}</div>
+                            <div style="color:#EE4C29">ราคารวม : {{ item.p_total | formatPrice }}</div>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-btn color="red" @click="delProductCart(item)">DELETE</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-hover>
+            </v-col>
+        </v-row>
+        <v-row v-if="apidata.length > 0">
+            <v-col cols="12" md="2" sm="4" xs="2">
+                <v-card class="mx-auto" width="200">
+                    <v-card-title primary-title>
+                        <div>ราคารวมทั้งหมด</div>
+                    </v-card-title>
+                    <v-card-text>
+                        <div style="color:#EE4C29 ">฿ {{ getNet() | formatPrice }}</div>
+                        <v-btn class="mt-5" color="success" @click="OrderConfirm()">Order Confirm</v-btn>
+                    </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
     </div>
-
-
 </template>
 
 <script>
-import Cookies from 'js-cookie';
+import Cookie from 'js-cookie';
 export default {
-
+    filters: {
+        formatPrice(value) {
+            if (!value) return ''
+            return parseFloat(value).toLocaleString();
+        }
+    },
     data() {
         return {
-            token: Cookies.get('token'),
+            token: Cookie.get('token'),
+            rating: 3.5,
             id: '',
-            apidata: []
+            apidata: [],
+            quantities: []
         }
+    },
+    created() {
+        this.getData()
     },
     methods: {
         getData() {
-            this.axios.get('http://localhost:3000/api/products/carts',{
-                headers: {
-                    Authorization: `Bearer ${this.token}`
+            console.log(this.token);
+            this.axios.get('http://localhost:3000/api/v1/products/emp/carts',
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`
+                    }
                 }
+            ).then((response) => {
+                console.log('data from api', response.data);
+                this.apidata = response.data.data
             })
-            .then(res => {
-                this.apidata = res.data.data;
-                console.log(this.apidata);
-            })
-            .catch(err => {
-                console.log('Error fetching cart data', err);
-            })
-                
+        },
+        async delProductCart(item) {
+            console.log('delete item', item._id)
+            try {
+                const res = await this.axios.delete(`http://localhost:3000/api/v1/products/emp/carts/` + item._id,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${this.token}`
+                        }
+                    })
+                alert('Delete success');
+                console.log('Delete success', res.data);
+                this.getData();
+            } catch (error) {
+                console.log('Delete error', error.response.data.message)
+                alert('Delete error');
+            }
+        },
+        getNet() {
+        let total = 0;
+        for (const item of this.apidata) {
+            total += item.Qty * item.p_price;
         }
-    },
+        return total;
+        },
+        async OrderConfirm() {
+            try {
+                const res = await this.axios.post('http://localhost:3000/api/v1/products/confirmorder',
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${this.token}`
+                        }
+                    })
+                alert('Order success');
+                console.log('Order success', res.data);
+                this.$router.push('/product-emp');
+            } catch (error) {
+                console.log('Order error', error.response.data.message)
+                alert('Order error');
+            }
+        }
+    }
 }
 
 </script>

@@ -6,12 +6,12 @@
       dark
       style="max-height: 100px;"
     >
-      <div class="d-flex align-center">
+      <div class="d-flex align-center" @click="home()" >
+        
         <v-img
           src="../assets/shopee-white.png"
           class="app-bar-logo"
         />
-        
       </div>
 
       <v-spacer></v-spacer>
@@ -64,6 +64,9 @@ export default {
     },
     cart() {
       this.$router.push('/allcart')
+    },
+    home(){
+        this.$router.push('product-emp')
     }
   }
 }
